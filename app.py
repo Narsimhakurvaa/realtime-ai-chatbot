@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 from chatbot import get_ai_response
+import time
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secretkey'
@@ -13,12 +14,19 @@ def index():
 @socketio.on('user_message')
 def handle_user_message(data):
     user_msg = data['message']
-    bot_reply = get_ai_response(user_msg)
 
-    emit('bot_message', {
-        'user': user_msg,
-        'bot': bot_reply
-    }, broadcast=True)
+    # notify typing
+    emit('bot_typing', broadcast=True)
+
+    # generate reply
+    reply = get_ai_response(user_msg)
+
+    # stream word-by-word
+    for word in reply.split():
+        emit('bot_stream', word + " ", broadcast=True)
+        socketio.sleep(0.15)  # streaming speed
+
+    emit('bot_done', broadcast=True)
 
 if __name__ == '__main__':
     socketio.run(app)

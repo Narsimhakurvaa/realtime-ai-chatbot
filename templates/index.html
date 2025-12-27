@@ -1,38 +1,30 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Real-Time AI Chatbot</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-</head>
-<body>
-
-<div class="chatbox">
-    <h2>🤖 Real-Time AI Chatbot</h2>
-
-    <div id="chat"></div>
-
-    <input id="msg" placeholder="Ask something..." />
-    <button onclick="sendMessage()">Send</button>
-</div>
-
 <script>
     var socket = io();
+    var chat = document.getElementById("chat");
+    var botLine = null;
 
-    socket.on('bot_message', function(data) {
-        var chat = document.getElementById("chat");
-
-        chat.innerHTML += "<p><b>You:</b> " + data.user + "</p>";
-        chat.innerHTML += "<p><b>Bot:</b> " + data.bot + "</p>";
+    socket.on('bot_typing', function () {
+        botLine = document.createElement("p");
+        botLine.innerHTML = "<b>Bot:</b> ";
+        chat.appendChild(botLine);
         chat.scrollTop = chat.scrollHeight;
+    });
+
+    socket.on('bot_stream', function (word) {
+        if (botLine) {
+            botLine.innerHTML += word;
+            chat.scrollTop = chat.scrollHeight;
+        }
+    });
+
+    socket.on('bot_done', function () {
+        botLine = null;
     });
 
     function sendMessage() {
         var msg = document.getElementById("msg").value;
-        socket.emit('user_message', {message: msg});
+        chat.innerHTML += "<p><b>You:</b> " + msg + "</p>";
+        socket.emit('user_message', { message: msg });
         document.getElementById("msg").value = "";
     }
 </script>
-
-</body>
-</html>

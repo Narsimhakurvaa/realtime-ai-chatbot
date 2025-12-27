@@ -1,20 +1,27 @@
+import random
+import time
+
 def get_ai_response(user_msg):
     msg = user_msg.lower()
 
-    if "hello" in msg or "hi" in msg:
-        return "Hello! 👋 How can I help you today?"
+    responses = {
+        "hello": [
+            "Hello 👋 How can I help you today?",
+            "Hi there! Ready to explore real-time AI 🚀"
+        ],
+        "cloud": [
+            "Cloud computing allows applications to run on internet servers instead of local machines.",
+            "In cloud computing, apps are scalable, available, and globally accessible."
+        ],
+        "ai": [
+            "Artificial Intelligence enables machines to learn, reason, and respond intelligently."
+        ]
+    }
 
-    elif "who are you" in msg:
-        return "I am a real-time AI chatbot built using Flask and WebSockets."
+    time.sleep(0.8)  # thinking delay
 
-    elif "cloud" in msg:
-        return "Cloud computing allows applications to run on internet servers instead of local machines."
+    for key in responses:
+        if key in msg:
+            return random.choice(responses[key])
 
-    elif "help" in msg:
-        return "Sure 🙂 Ask me anything about AI, cloud, or programming."
-
-    elif "bye" in msg:
-        return "Goodbye 👋 Have a great day!"
-
-    else:
-        return "🤔 I am still learning. Can you rephrase your question?"
+    return "This is a real-time streaming AI chatbot responding word by word like ChatGPT."
